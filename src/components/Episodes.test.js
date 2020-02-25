@@ -1,11 +1,14 @@
 import React from 'react';
 import { render, fireEvent, waitForElement, wait } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
-import { fetchShow as mockFetchShow } from './api/fetchShow';
+import { fetchShow as mockFetchShow } from '../api/fetchShow';
 import Episodes from './Episodes';
 
-const season = {
- episode: [
+jest.mock("../api/fetchShow");
+console.log(mockFetchShow);
+
+const episodes = 
+[
     {
     id: 553946,
     url: 'http://www.tvmaze.com/episodes/553946/stranger-things-1x01-chapter-one-the-vanishing-of-will-byers',
@@ -550,4 +553,14 @@ const season = {
     }
     }
 ]
-}
+
+
+test('Each episode is loaded', async() => {
+    mockFetchShow.mockResolvedValueOnce(episodes)
+    const { getByText, queryAllByTestId } = render(<Episodes episodes = {episodes} />)
+     
+    await wait(() => {
+        getByText(/Chapter One: The Vanishing of Will Byers/i);
+    })
+    expect(queryAllByTestId('episode')).toHaveLength(26);
+})
